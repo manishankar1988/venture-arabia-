@@ -3,9 +3,10 @@
 #
 #   1. Push this repo to GitHub.
 #   2. On https://dashboard.render.com  ->  New  ->  Blueprint  ->  select the repo  ->  Apply.
-#   3. When the first deploy finishes, open the service Shell and run:
-#        python manage.py seed_demo && python manage.py attach_catalogue_images && python manage.py createsuperuser
-#   4. Admin panel:  https://<your-service>.onrender.com/manage/
+#   3. The first start seeds the catalogue and creates the admin user automatically
+#      (bootstrap_site). Find the generated admin password in the service's
+#      Environment tab (DJANGO_SUPERUSER_PASSWORD) and change it after the first login.
+#   4. Admin panel:  https://<your-service>.onrender.com/manage/   (user: admin)
 #
 # Notes: the free web service sleeps after 15 minutes idle and its disk is reset on every
 # deploy, so photos uploaded through the admin need the paid persistent disk (or keep
@@ -28,7 +29,7 @@ services:
     branch: main
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     # migrations run at start (the database is only reachable from the running service, not the build)
-    startCommand: python manage.py migrate --noinput && gunicorn venture.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    startCommand: python manage.py migrate --noinput && python manage.py bootstrap_site && gunicorn venture.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
@@ -55,6 +56,12 @@ services:
         value: "0"
       - key: SERVE_MEDIA
         value: "1"
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: "admin"
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: "venture@venture.com.qa"
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true
       - key: DEFAULT_FROM_EMAIL
         value: "Venture Arabia <venture@venture.com.qa>"
       - key: ORDER_NOTIFICATION_EMAIL

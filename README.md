@@ -122,8 +122,9 @@ All of them use the same code from git and the same `.env` values (section 4.3).
 **0. Quick public URL for testing (Render.com, free tier)**
 Push the repo to GitHub, then on <https://dashboard.render.com> choose *New -> Blueprint*, pick the
 repository and apply `render.yaml`. You get `https://venture-arabia.onrender.com` with PostgreSQL
-attached. Afterwards open the service *Shell* and run `python manage.py seed_demo`,
-`python manage.py attach_catalogue_images` and `python manage.py createsuperuser`.
+attached. The first start seeds the catalogue and creates the admin user `admin` by itself
+(`bootstrap_site`); read the generated password from the service's *Environment* tab
+(`DJANGO_SUPERUSER_PASSWORD`) and change it after logging in.
 The free tier sleeps when idle and loses admin-uploaded photos on redeploy, so use it for
 review, not for the real shop.
 
