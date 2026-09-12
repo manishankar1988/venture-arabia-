@@ -15,7 +15,7 @@
       {% if service.turnaround %}<p class="small muted">Turnaround: {{ service.turnaround }}</p>{% endif %}
       <a href="{% url 'catalog:quote_request' %}?service={{ service.slug }}" class="btn btn-block">Request a quote</a>
       {% if site.whatsapp_link %}<a href="{{ site.whatsapp_link }}" class="btn btn-outline btn-block" style="margin-top:.5rem" target="_blank" rel="noopener">WhatsApp us</a>{% endif %}
-      <p class="small muted" style="margin-top:1rem">Free collection &amp; delivery within Doha. Call {{ site.phone }}.</p>
+      <p class="small muted" style="margin-top:1rem">Free collection &amp; delivery across Doha. Call {{ site.phone }}.</p>
     </div>
     {% if others %}
     <div style="margin-top:1.2rem">

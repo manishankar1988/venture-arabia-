@@ -23,7 +23,7 @@
               </div>
             </div>
           </td>
-          <td data-label="Price">{{ CURRENCY }} {{ item.unit_price|floatformat:2 }}</td>
+          <td data-label="Price">{% if item.has_price %}{{ CURRENCY }} {{ item.unit_price|floatformat:2 }}{% else %}<span class="muted">On request</span>{% endif %}</td>
           <td data-label="Qty">
             <form method="post" action="{% url 'shop:cart_update' item.key %}" class="qty">
               {% csrf_token %}
@@ -31,7 +31,7 @@
               <button type="submit" class="btn btn-outline btn-sm">Update</button>
             </form>
           </td>
-          <td data-label="Total"><strong>{{ CURRENCY }} {{ item.line_total|floatformat:2 }}</strong></td>
+          <td data-label="Total"><strong>{% if item.has_price %}{{ CURRENCY }} {{ item.line_total|floatformat:2 }}{% else %}<span class="muted">To be confirmed</span>{% endif %}</strong></td>
           <td>
             <form method="post" action="{% url 'shop:cart_remove' item.key %}">{% csrf_token %}<button type="submit" class="btn btn-outline btn-sm" aria-label="Remove">✕</button></form>
           </td>
@@ -44,10 +44,11 @@
   <aside class="summary">
     <h3>Order summary</h3>
     <dl>
-      <dt>Subtotal</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
-      <dt>Delivery (Doha)</dt><dd>{% if delivery_fee == 0 %}Free{% else %}{{ CURRENCY }} {{ delivery_fee|floatformat:2 }}{% endif %}</dd>
+      <dt>Subtotal{% if has_unpriced %} (priced items){% endif %}</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
+      <dt>Delivery across Doha</dt><dd>{% if delivery_fee == 0 %}Free{% else %}{{ CURRENCY }} {{ delivery_fee|floatformat:2 }}{% endif %}</dd>
       <div class="total" style="display:contents"><dt>Estimated total</dt><dd>{{ CURRENCY }} {{ estimated_total|floatformat:2 }}</dd></div>
     </dl>
+    {% if has_unpriced %}<p class="small muted">Items marked "on request" are priced when we confirm your order and proof - no payment is taken online.</p>{% endif %}
     {% if delivery_fee != 0 and site.free_delivery_threshold %}<p class="small muted">Free delivery on orders over {{ CURRENCY }} {{ site.free_delivery_threshold|floatformat:0 }}. Collection from our office is always free.</p>{% endif %}
     <a href="{% url 'shop:checkout' %}" class="btn btn-block">Proceed to checkout</a>
     <p class="small muted" style="margin-top:.8rem;text-align:center">Cash or card on delivery · Bank transfer</p>

@@ -96,13 +96,13 @@ STAMP_PADS = [
 ]
 
 SERVICES = [
-    ("Custom rubber stamp making", "stamp", "All types of rubber, self-inking and pre-inked stamps made to order - company seals, signature stamps, daters, Arabic & English text and logos.", "Send us your text or artwork and we will prepare a proof for approval before production. We stock the complete Trodat Printy and Professional ranges and can also make traditional wooden-handle rubber stamps, pocket stamps and heavy-duty metal-frame stamps.\n\nTypical turnaround is the same or next working day. Bulk orders for schools, clinics, ministries and corporate offices are welcome.", "40.00", "per stamp", "Same / next working day"),
-    ("Photocopying (B&W and colour)", "copy", "High-volume black & white and colour photocopying with special rates for schools, colleges and corporate offices.", "A4 and A3 photocopying in black & white or full colour, single or double sided, with optional stapling, hole punching and sorting.\n\nWe offer special contract rates for schools, colleges, training centres and corporate offices, and collect and deliver documents free of charge within Doha.", "0.25", "per page", "Same day for most jobs"),
-    ("Printing", "print", "Digital printing of documents, letterheads, business cards, flyers, certificates, labels and more.", "Short-run digital printing on a range of paper stocks. We print reports, proposals, training manuals, letterheads, business cards, invitation cards, flyers, certificates and stickers.\n\nSend us your files (PDF preferred) or let us help with the layout. Free collection and delivery within Doha.", "1.00", "per page", "1-2 working days"),
-    ("Laminating", "laminate", "Protect documents, certificates, ID cards and menus with gloss or matt lamination.", "Pouch lamination from ID-card size up to A3, in gloss or matt finish. Ideal for certificates, notices, menus, name badges and classroom materials.", "3.00", "per sheet", "Same day"),
-    ("Binding", "bind", "Spiral, comb, thermal and hard-cover binding for reports, theses, manuals and proposals.", "Choose from plastic comb binding, metal spiral (wire-o) binding, thermal binding and hard-cover binding with clear or coloured covers. Suitable for reports, dissertations, tender documents, training manuals and presentations.", "8.00", "per document", "Same / next working day"),
+    ("Custom rubber stamp making", "stamp", "All types of rubber, self-inking and pre-inked stamps made to order - company seals, signature stamps, daters, Arabic & English text and logos.", "Send us your text or artwork and we will prepare a proof for approval before production. We stock the complete Trodat Printy and Professional ranges and can also make traditional wooden-handle rubber stamps, pocket stamps and heavy-duty metal-frame stamps.\n\nTypical turnaround is the same or next working day. Bulk orders for schools, clinics, ministries and corporate offices are welcome.", None, "", "Same / next working day"),
+    ("Photocopying (B&W and colour)", "copy", "High-volume black & white and colour photocopying with special rates for schools, colleges and corporate offices.", "A4 and A3 photocopying in black & white or full colour, single or double sided, with optional stapling, hole punching and sorting.\n\nWe offer special contract rates for schools, colleges, training centres and corporate offices, and collect and deliver documents free of charge across Doha.", None, "", "Same day for most jobs"),
+    ("Printing", "print", "Digital printing of documents, letterheads, business cards, flyers, certificates, labels and more.", "Short-run digital printing on a range of paper stocks. We print reports, proposals, training manuals, letterheads, business cards, invitation cards, flyers, certificates and stickers.\n\nSend us your files (PDF preferred) or let us help with the layout. Free collection and delivery across Doha.", None, "", "1-2 working days"),
+    ("Laminating", "laminate", "Protect documents, certificates, ID cards and menus with gloss or matt lamination.", "Pouch lamination from ID-card size up to A3, in gloss or matt finish. Ideal for certificates, notices, menus, name badges and classroom materials.", None, "", "Same day"),
+    ("Binding", "bind", "Spiral, comb, thermal and hard-cover binding for reports, theses, manuals and proposals.", "Choose from plastic comb binding, metal spiral (wire-o) binding, thermal binding and hard-cover binding with clear or coloured covers. Suitable for reports, dissertations, tender documents, training manuals and presentations.", None, "", "Same / next working day"),
     ("Computer toners & accessories", "toner", "Original and compatible toner cartridges plus printer accessories for HP, Canon, Brother, Samsung, Kyocera and more.", "We supply original and high-quality compatible toner and ink cartridges for all major printer brands, along with drums, fusers, paper and other consumables.\n\nTell us your printer model and we will quote the best available option with free delivery to your office.", None, "", "Same / next working day"),
-    ("Free collection & delivery", "delivery", "We collect your documents and deliver finished work anywhere in Doha at no extra charge.", "For photocopying, printing, laminating and binding jobs we collect your originals from your school, college or office and return the finished work - free of charge within Doha. Simply call, WhatsApp or request a quote and our driver will be in touch.", None, "", "Scheduled with your order"),
+    ("Collection & delivery across Doha", "delivery", "We collect your documents and deliver finished work across Doha at no extra charge.", "For photocopying, printing, laminating and binding jobs we collect your originals from your school, college or office and return the finished work - free of charge, across Doha. Simply call, WhatsApp or request a quote and our driver will be in touch.", None, "", "Scheduled with your order"),
 ]
 
 
@@ -133,22 +133,22 @@ class Command(BaseCommand):
             self._stamp(cat_oval, sku, name, plate, cart, colours, price, featured, desc)
 
         self._product(
-            cat_text, "4911-TEXTILE", "Trodat Printy 4911 clothing marker", "38 mm x 14 mm", "6/4911 Textile", "Red", "55.00", False,
+            cat_text, "4911-TEXTILE", "Trodat Printy 4911 clothing marker", "38 mm x 14 mm", "6/4911 Textile", "Red", None, False,
             "Self-inking stamp with black textile ink for marking school uniforms, sports kits, towels and workwear. Withstands washing.",
             ink_colours="Black (textile)", customisable=True, short="Mark clothing and fabric with a permanent name stamp.",
         )
 
         for sku, name, plate, cart, date_size, colours, price, featured, desc in DATERS:
-            self._product(cat_dater, sku, name, plate, cart, colours, price, featured, desc, date_size=date_size, customisable=True, short=f"Self-inking dater with custom text, {date_size} date, {plate} plate.")
+            self._product(cat_dater, sku, name, plate, cart, colours, None, featured, desc, date_size=date_size, customisable=True, short=f"Self-inking dater with custom text, {date_size} date, {plate} plate.")
         for suffix, text in (("L1", "RECEIVED"), ("L2", "PAID"), ("L9", "FAXED")):
             self._product(
-                cat_dater, f"4750/{suffix}", f"Trodat Printy 4750/{suffix} '{text}' dater", "41 mm x 24 mm", "6/4750/2", "Black", "120.00", False,
+                cat_dater, f"4750/{suffix}", f"Trodat Printy 4750/{suffix} '{text}' dater", "41 mm x 24 mm", "6/4750/2", "Black", None, False,
                 f"Ready-made two-colour dater with the stock text '{text}' in blue and the date in red. No custom text required - ready to ship.",
                 date_size="4 mm", customisable=False, ink_colours="Blue / Red (2-colour)", short=f"Stock-text dater: {text} + date. Ready to ship.",
             )
-        self._product(cat_dater, "5460", "Trodat Professional 5460 dater with text", "56 mm x 33 mm", "6/56", "Black / Silver", "220.00", True,
+        self._product(cat_dater, "5460", "Trodat Professional 5460 dater with text", "56 mm x 33 mm", "6/56", "Black / Silver", None, True,
                       "Heavy-duty metal-frame self-inking dater for high-volume use in banks, ministries and accounts departments. Custom text above and below the date.", date_size="4 mm", customisable=True, short="Heavy-duty professional dater for high-volume use.")
-        self._product(cat_stamps, "5211", "Trodat Professional 5211 text stamp", "85 mm x 55 mm", "6/5211", "Black / Silver", "260.00", False,
+        self._product(cat_stamps, "5211", "Trodat Professional 5211 text stamp", "85 mm x 55 mm", "6/5211", "Black / Silver", None, False,
                       "Extra-large heavy-duty text stamp with metal frame - for detailed company seals, delivery stamps and forms.", customisable=True, short="Extra-large heavy-duty text stamp.")
 
         for sku, fits, price in INK_CARTRIDGES:
@@ -202,7 +202,7 @@ class Command(BaseCommand):
         if not HomeBanner.objects.exists():
             HomeBanner.objects.create(
                 title="Trodat stamps, toners and print services - delivered across Doha",
-                subtitle="Authorised Trodat dealer since 2009. Custom rubber stamps made the same day, genuine toners, and printing, photocopying, laminating and binding with free collection and delivery.",
+                subtitle="Trodat stamps dealer in Doha since 2009. Custom rubber stamps made the same day, genuine toners, and printing, photocopying, laminating and binding with free collection and delivery across Doha.",
                 button_text="Shop stamps",
                 button_url="/products/",
             )
@@ -216,8 +216,9 @@ class Command(BaseCommand):
         return obj
 
     def _stamp(self, category, sku, name, plate, cartridge, colours, price, featured, desc):
+        # Stamps are shown without a price (price on request, confirmed before production)
         self._product(
-            category, sku, name, plate, cartridge, colours, price, featured, desc,
+            category, sku, name, plate, cartridge, colours, None, featured, desc,
             customisable=True, short=f"Self-inking text stamp, max. plate {plate}.",
         )
 
@@ -225,7 +226,7 @@ class Command(BaseCommand):
                  short="", date_size="", customisable=False, ink_colours=INK, track_stock=False, stock=0, help=""):
         defaults = {
             "category": category, "name": name, "plate_size": plate, "ink_cartridge": cartridge,
-            "available_colours": colours, "price": Decimal(price), "is_featured": featured,
+            "available_colours": colours, "price": Decimal(price) if price is not None else None, "is_featured": featured,
             "description": desc, "short_description": short, "date_size": date_size,
             "is_customisable": customisable, "ink_colours": ink_colours,
             "track_stock": track_stock, "stock_quantity": stock,

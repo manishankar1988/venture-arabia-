@@ -7,14 +7,15 @@ Date: {{ order.created_at|date:"j F Y, H:i" }}
 Status: {{ order.get_status_display }}
 
 ITEMS
-{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} ({{ item.sku }}) @ {{ order.currency }} {{ item.unit_price }} = {{ order.currency }} {{ item.line_total }}{% if item.custom_text %}
+{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} ({{ item.sku }}){% if item.has_price %} @ {{ order.currency }} {{ item.unit_price }} = {{ order.currency }} {{ item.line_total }}{% else %} - price on request (confirmed before production){% endif %}{% if item.custom_text %}
   Custom text: {{ item.custom_text }}{% endif %}
 {% endfor %}
 Subtotal: {{ order.currency }} {{ order.subtotal }}
 Delivery: {{ order.currency }} {{ order.delivery_fee }}{% if order.tax_amount %}
 Tax ({{ order.tax_rate_percent }}%): {{ order.currency }} {{ order.tax_amount }}{% endif %}
-TOTAL: {{ order.currency }} {{ order.total }}
-
+TOTAL{% if order.has_unpriced_items %} (priced items only){% endif %}: {{ order.currency }} {{ order.total }}
+{% if order.has_unpriced_items %}Items marked "price on request" will be priced when we confirm your order.
+{% endif %}
 DELIVERY
 {{ order.get_delivery_method_display }}
 {{ order.delivery_address }}

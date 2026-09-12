@@ -95,6 +95,10 @@ class Order(models.Model):
         return ", ".join(p for p in parts if p)
 
     @property
+    def has_unpriced_items(self):
+        return self.items.filter(unit_price__isnull=True).exists()
+
+    @property
     def is_open(self):
         return self.status not in {self.Status.DELIVERED, self.Status.CANCELLED}
 
@@ -113,12 +117,16 @@ class OrderItem(models.Model):
     product = models.ForeignKey("catalog.Product", null=True, on_delete=models.SET_NULL, related_name="order_items")
     product_name = models.CharField(max_length=200)
     sku = models.CharField(max_length=60)
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Empty = price to be confirmed with the customer.")
     quantity = models.PositiveIntegerField(default=1)
     custom_text = models.TextField(blank=True, help_text="Stamp text or customisation instructions supplied by the customer.")
 
     def __str__(self):
         return f"{self.quantity} x {self.product_name}"
+
+    @property
+    def has_price(self):
+        return self.unit_price is not None
 
     @property
     def line_total(self):

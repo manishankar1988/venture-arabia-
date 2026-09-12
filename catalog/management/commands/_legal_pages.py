@@ -13,13 +13,13 @@ EMAIL = "venture@venture.com.qa"
 PHONE = "+974 4468 9269 / +974 5588 3587"
 
 ABOUT = f"""
-<p>{COMPANY} has been serving businesses, schools, colleges and government offices in Doha since 2009. We are an authorised dealer of <strong>Trodat</strong> stamps - the world's leading self-inking stamp brand, made in Austria - and we manufacture all types of rubber stamps to order.</p>
+<p>{COMPANY} has been serving businesses, schools, colleges and government offices in Doha since 2009. We are a dealer of <strong>Trodat</strong> stamps - the world's leading self-inking stamp brand, made in Austria - and we manufacture all types of rubber stamps to order.</p>
 <h2>What we do</h2>
 <ul>
 <li><strong>Stamps:</strong> Trodat Printy and Professional self-inking stamps, daters, round seals, pocket stamps, traditional rubber stamps, replacement ink cartridges, pads and inks.</li>
 <li><strong>Computer toners and accessories:</strong> original and compatible cartridges for all major printer brands.</li>
 <li><strong>Printing, photocopying, laminating and binding:</strong> with special rates for schools, colleges and corporate offices.</li>
-<li><strong>Free collection and delivery</strong> within Doha.</li>
+<li><strong>Free collection and delivery</strong> across Doha.</li>
 </ul>
 <h2>Where to find us</h2>
 <p>{ADDRESS}, near the Al Ahli Bank building.<br>Tel: {PHONE}<br>Email: <a href="mailto:{EMAIL}">{EMAIL}</a></p>
@@ -34,7 +34,7 @@ TERMS = f"""
 
 <h2>2. Products, services and prices</h2>
 <ul>
-<li>All prices are shown in Qatari Riyal (QAR) and include all applicable taxes. Qatar does not currently apply VAT to these goods; should this change, taxes will be shown separately before you confirm your order.</li>
+<li>Prices, where shown, are in Qatari Riyal (QAR) and include all applicable taxes. Stamps and services are quoted individually: we confirm the price with you (by phone, WhatsApp or email) before production starts, and you may cancel free of charge before confirming. Qatar does not currently apply VAT to these goods; should this change, taxes will be shown separately before you confirm your order.</li>
 <li>Delivery charges, if any, are shown clearly in the cart and at checkout before you place your order. Collection from our office is free.</li>
 <li>Product descriptions, sizes and colours are provided as accurately as possible from the manufacturer's information. Minor variations may occur.</li>
 <li>We reserve the right to correct pricing or description errors. If an error affects an order you have placed, we will contact you before proceeding and you may cancel for a full refund of any amount paid.</li>
@@ -58,7 +58,7 @@ TERMS = f"""
 </ul>
 
 <h2>6. Delivery and collection</h2>
-<p>We deliver within Doha and surrounding areas. Estimated production and delivery times are indicated on the product page and confirmed when we confirm your order. Delivery times are estimates and may be affected by circumstances beyond our control. Risk in the goods passes to you on delivery or collection.</p>
+<p>We deliver across Doha and surrounding areas. Estimated production and delivery times are indicated on the product page and confirmed when we confirm your order. Delivery times are estimates and may be affected by circumstances beyond our control. Risk in the goods passes to you on delivery or collection.</p>
 
 <h2>7. Cancellations, returns and refunds</h2>
 <p>Your rights are described in our <a href="/pages/returns-and-refunds/">Returns &amp; Refunds Policy</a>, which forms part of these Terms. Nothing in these Terms limits your statutory rights under Qatar's Consumer Protection Law.</p>
@@ -132,7 +132,7 @@ RETURNS = f"""
 </ul>
 
 <h2>2. Defective, damaged or incorrect goods</h2>
-<p>If a product is defective, damaged on arrival, or does not match what you ordered (or the approved proof), please tell us within <strong>7 days of delivery</strong>. We will, at your choice and in line with the Consumer Protection Law, repair or replace the item or refund the price paid. We will collect the item free of charge within Doha. Trodat stamps also benefit from the manufacturer's warranty against defects in materials and workmanship.</p>
+<p>If a product is defective, damaged on arrival, or does not match what you ordered (or the approved proof), please tell us within <strong>7 days of delivery</strong>. We will, at your choice and in line with the Consumer Protection Law, repair or replace the item or refund the price paid. We will collect the item free of charge across Doha. Trodat stamps also benefit from the manufacturer's warranty against defects in materials and workmanship.</p>
 
 <h2>3. Change of mind - stock items</h2>
 <p>Unused stock items in their original, unopened packaging may be returned within <strong>7 days of delivery</strong> for a refund or exchange. Opened consumables (ink cartridges, pads, inks, toners, paper) cannot be returned for hygiene and quality reasons unless defective. Delivery charges for change-of-mind returns are borne by the customer.</p>
@@ -154,9 +154,9 @@ DELIVERY = f"""
 <h2>Delivery area and charges</h2>
 <ul>
 <li>We deliver throughout Doha and nearby areas (Al Rayyan, Al Wakrah, Lusail and surrounding zones). For other locations in Qatar please contact us before ordering.</li>
-<li>The delivery charge, if any, is displayed in the cart and at checkout before you place your order. Orders above the amount shown at checkout qualify for free delivery.</li>
+<li>Delivery across Doha is free of charge. Should a delivery charge ever apply, it is displayed in the cart and at checkout before you place your order.</li>
 <li><strong>Collection</strong> from our office at {ADDRESS} is always free of charge during opening hours.</li>
-<li>For photocopying, printing, laminating and binding jobs we <strong>collect your documents and deliver the finished work free of charge</strong> within Doha.</li>
+<li>For photocopying, printing, laminating and binding jobs we <strong>collect your documents and deliver the finished work free of charge</strong> across Doha.</li>
 </ul>
 <h2>Production and delivery times</h2>
 <ul>

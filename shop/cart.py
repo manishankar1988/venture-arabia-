@@ -75,7 +75,8 @@ class Cart:
                 "quantity": item["quantity"],
                 "custom_text": item.get("custom_text", ""),
                 "unit_price": product.price,
-                "line_total": product.price * item["quantity"],
+                "has_price": product.has_price,
+                "line_total": product.price * item["quantity"] if product.has_price else None,
             }
 
     @property
@@ -92,4 +93,9 @@ class Cart:
 
     @property
     def subtotal(self):
-        return sum((item["line_total"] for item in self), Decimal("0.00"))
+        """Sum of the priced lines only; unpriced (price-on-request) lines are confirmed later."""
+        return sum((item["line_total"] for item in self if item["has_price"]), Decimal("0.00"))
+
+    @property
+    def has_unpriced(self):
+        return any(not item["has_price"] for item in self)

@@ -36,7 +36,7 @@ def cart_detail(request):
     return render(
         request,
         "shop/cart.html",
-        {"cart": cart, "subtotal": subtotal, "delivery_fee": fee, "estimated_total": subtotal + fee},
+        {"cart": cart, "subtotal": subtotal, "delivery_fee": fee, "estimated_total": subtotal + fee, "has_unpriced": cart.has_unpriced},
     )
 
 
@@ -112,6 +112,7 @@ def checkout(request):
         "subtotal": subtotal,
         "delivery_fee": _delivery_fee(site, subtotal, Order.DeliveryMethod.DELIVERY),
         "tax": tax,
+        "has_unpriced": cart.has_unpriced,
     }
     return render(request, "shop/checkout.html", context)
 

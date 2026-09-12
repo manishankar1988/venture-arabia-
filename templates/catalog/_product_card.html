@@ -8,7 +8,7 @@
     <h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
     {% if product.short_description %}<p class="muted small" style="margin:0">{{ product.short_description|truncatechars:70 }}</p>{% endif %}
     <div class="card-footer">
-      <span class="price">{{ CURRENCY }} {{ product.price|floatformat:2 }}{% if product.is_on_sale %}<del>{{ product.compare_at_price|floatformat:2 }}</del>{% endif %}</span>
+      {% if product.has_price %}<span class="price">{{ CURRENCY }} {{ product.price|floatformat:2 }}{% if product.is_on_sale %}<del>{{ product.compare_at_price|floatformat:2 }}</del>{% endif %}</span>{% else %}<span class="price price-request">Price on request</span>{% endif %}
       <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-outline">{% if product.is_customisable %}Customise{% else %}View{% endif %}</a>
     </div>
   </div>

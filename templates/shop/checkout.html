@@ -53,14 +53,14 @@
   <aside class="summary">
     <h3>Your order</h3>
     <ul class="plain">
-      {% for item in cart %}<li style="display:flex;justify-content:space-between;gap:.5rem;font-size:.9rem"><span>{{ item.quantity }} × {{ item.product.name }}</span><span>{{ CURRENCY }} {{ item.line_total|floatformat:2 }}</span></li>{% endfor %}
+      {% for item in cart %}<li style="display:flex;justify-content:space-between;gap:.5rem;font-size:.9rem"><span>{{ item.quantity }} × {{ item.product.name }}</span><span>{% if item.has_price %}{{ CURRENCY }} {{ item.line_total|floatformat:2 }}{% else %}<span class="muted">On request</span>{% endif %}</span></li>{% endfor %}
     </ul>
     <dl>
-      <dt>Subtotal</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
+      <dt>Subtotal{% if has_unpriced %} (priced items){% endif %}</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
       <dt>Delivery</dt><dd>{% if delivery_fee == 0 %}Free{% else %}{{ CURRENCY }} {{ delivery_fee|floatformat:2 }}{% endif %}</dd>
       {% if tax %}<dt>Tax ({{ site.tax_rate_percent }}%)</dt><dd>{{ CURRENCY }} {{ tax|floatformat:2 }}</dd>{% endif %}
     </dl>
-    <p class="small muted">The final total is confirmed on the next page. Collection from our office is free of delivery charges.</p>
+    <p class="small muted">{% if has_unpriced %}Prices for items marked "on request" are confirmed with you before production. {% endif %}The final total is confirmed on the next page.</p>
     <p class="small muted"><a href="{% url 'shop:cart' %}">‹ Edit cart</a></p>
   </aside>
 </form>

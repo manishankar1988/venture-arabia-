@@ -3,7 +3,7 @@
 {% block meta_description %}{{ product.short_description|default:product.description|truncatechars:160 }}{% endblock %}
 {% block og_title %}{{ product.name }}{% endblock %}
 {% block head %}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"{{ product.name|escapejs }}","sku":"{{ product.sku|escapejs }}","brand":{"@type":"Brand","name":"{{ product.brand|escapejs }}"},"description":"{{ product.short_description|escapejs }}","offers":{"@type":"Offer","priceCurrency":"{{ CURRENCY }}","price":"{{ product.price }}","availability":"https://schema.org/{% if product.in_stock %}InStock{% else %}OutOfStock{% endif %}","url":"{{ request.build_absolute_uri }}"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"{{ product.name|escapejs }}","sku":"{{ product.sku|escapejs }}","brand":{"@type":"Brand","name":"{{ product.brand|escapejs }}"},"description":"{{ product.short_description|escapejs }}",{% if product.has_price %}"offers":{"@type":"Offer","priceCurrency":"{{ CURRENCY }}","price":"{{ product.price }}","availability":"https://schema.org/{% if product.in_stock %}InStock{% else %}OutOfStock{% endif %}","url":"{{ request.build_absolute_uri }}"}{% else %}"url":"{{ request.build_absolute_uri }}"{% endif %}}</script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -26,7 +26,7 @@
     <h1>{{ product.name }}</h1>
     {% if product.short_description %}<p class="muted">{{ product.short_description }}</p>{% endif %}
     <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:.5rem 0 1rem">
-      <span class="price">{{ CURRENCY }} {{ product.price|floatformat:2 }}{% if product.is_on_sale %}<del>{{ CURRENCY }} {{ product.compare_at_price|floatformat:2 }}</del>{% endif %}</span>
+      {% if product.has_price %}<span class="price">{{ CURRENCY }} {{ product.price|floatformat:2 }}{% if product.is_on_sale %}<del>{{ CURRENCY }} {{ product.compare_at_price|floatformat:2 }}</del>{% endif %}</span>{% else %}<span class="price price-request">Price on request</span>{% endif %}
       {% if product.in_stock %}<span class="stock in">{% if product.track_stock %}In stock{% else %}Made to order{% endif %}</span>{% else %}<span class="stock out">Out of stock</span>{% endif %}
     </div>
 
@@ -49,7 +49,7 @@
           </div>
         </div>
         <button type="submit" class="btn btn-block" {% if not product.in_stock %}disabled{% endif %}>Add to cart</button>
-        <p class="help" style="text-align:center;margin-top:.6rem">Free delivery in Doha for orders over {{ CURRENCY }} {{ site.free_delivery_threshold|floatformat:0 }}. Pay by cash or card on delivery, or bank transfer.</p>
+        <p class="help" style="text-align:center;margin-top:.6rem">{% if not product.has_price %}We confirm the price with you and send a proof before production. {% endif %}Delivery across Doha. Pay by cash or card on delivery, or bank transfer.</p>
       </form>
     </div>
 

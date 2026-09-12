@@ -123,6 +123,7 @@ ul.plain li { margin-bottom: .35rem; }
 .card-body h3 a { color: var(--navy); }
 .card-body .sku { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .price { font-weight: 700; color: var(--maroon); font-size: 1.05rem; }
+.price-request { color: var(--navy); font-size: .95rem; }
 .price del { color: var(--muted); font-weight: 400; font-size: .85rem; margin-left: .4rem; }
 .card-footer { margin-top: auto; padding-top: .6rem; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
 .tag { position: absolute; top: .6rem; left: .6rem; background: var(--maroon); color: #fff; font-size: .7rem; font-weight: 700; padding: .2rem .5rem; border-radius: 4px; text-transform: uppercase; }

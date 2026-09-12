@@ -12,6 +12,8 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 
+from cms.models import SiteSettings
+
 from catalog.models import Product, Service
 from cms.models import Page
 from shop.models import Order
@@ -48,6 +50,8 @@ class SiteTests(TestCase):
         for url in urls:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertContains(self.client.get(self.stamp.get_absolute_url()), "Price on request")
+        self.assertNotContains(self.client.get("/"), "Authorised")
         for page in Page.objects.filter(is_published=True):
             self.assertContains(self.client.get(page.get_absolute_url()), escape(page.title))
 
@@ -101,9 +105,12 @@ class SiteTests(TestCase):
         order = Order.objects.get()
         self.assertTrue(order.number.startswith("VA"))
         self.assertEqual(order.items.count(), 2)
-        self.assertEqual(order.subtotal, Decimal("176.00"))
+        # the stamp is price-on-request, only the 3 cartridges (3 x 22) are priced
+        self.assertIsNone(order.items.get(sku="4912").unit_price)
+        self.assertTrue(order.has_unpriced_items)
+        self.assertEqual(order.subtotal, Decimal("66.00"))
         self.assertEqual(order.delivery_fee, Decimal("0.00"))
-        self.assertEqual(order.total, Decimal("176.00"))
+        self.assertEqual(order.total, Decimal("66.00"))
         self.assertEqual(order.phone, "+97455883587")
         self.assertTrue(order.accepted_terms)
         self.assertEqual(order.items.get(sku="4912").custom_text, "VENTURE ARABIA\nDoha")
@@ -120,6 +127,7 @@ class SiteTests(TestCase):
         self.assertEqual(order.user.email, "test@example.com")
 
     def test_delivery_fee_and_free_delivery_threshold(self):
+        SiteSettings.objects.filter(pk=1).update(delivery_fee=Decimal("20.00"), free_delivery_threshold=Decimal("200.00"))
         self.client.post(reverse("shop:cart_add", args=[self.cartridge.pk]), {"quantity": 1})
         response = self.client.post("/shop/checkout/", {
             "full_name": "Test", "email": "t@example.com", "phone": "33905158", "delivery_method": "delivery",
@@ -128,7 +136,7 @@ class SiteTests(TestCase):
         })
         self.assertEqual(response.status_code, 302)
         order = Order.objects.get()
-        self.assertEqual(order.delivery_fee, Decimal("20.00"))  # below the free-delivery threshold
+        self.assertEqual(order.delivery_fee, Decimal("20.00"))  # fee configured, subtotal below the threshold
         self.assertEqual(order.total, order.subtotal + Decimal("20.00"))
 
     def test_order_tracking(self):

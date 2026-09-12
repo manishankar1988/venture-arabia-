@@ -53,7 +53,15 @@ class Product(models.Model):
     short_description = models.CharField(max_length=250, blank=True)
     description = models.TextField(blank=True, help_text="Plain text. Blank lines start a new paragraph.")
 
-    price = models.DecimalField("Price (QAR)", max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField(
+        "Price (QAR)",
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="Leave empty to show 'Price on request' - the price is then confirmed with the customer before production.",
+    )
     compare_at_price = models.DecimalField(
         "Compare-at price (QAR)",
         max_digits=10,
@@ -116,8 +124,12 @@ class Product(models.Model):
         return not self.track_stock or self.stock_quantity > 0
 
     @property
+    def has_price(self):
+        return self.price is not None
+
+    @property
     def is_on_sale(self):
-        return bool(self.compare_at_price and self.compare_at_price > self.price)
+        return bool(self.has_price and self.compare_at_price and self.compare_at_price > self.price)
 
     @property
     def discount_percent(self):

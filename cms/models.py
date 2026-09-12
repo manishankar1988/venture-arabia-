@@ -30,7 +30,7 @@ class SiteSettings(SingletonModel):
     company_name = models.CharField(max_length=120, default="Venture Arabia Trading Services")
     tagline = models.CharField(
         max_length=200,
-        default="Authorised Trodat stamp dealer in Doha since 2009 - rubber stamps, toners, printing & office services.",
+        default="Trodat stamp dealer in Doha since 2009 - rubber stamps, toners, printing & office services.",
     )
     logo = models.ImageField(upload_to="branding/", blank=True, help_text="PNG or SVG, ideally with a transparent background.")
 
@@ -70,7 +70,7 @@ class SiteSettings(SingletonModel):
     email = models.EmailField(default="venture@venture.com.qa")
     email_secondary = models.EmailField(blank=True, default="venstationery@gmail.com")
     opening_hours = models.TextField(
-        default="Saturday - Thursday: 8:00 AM - 1:00 PM, 4:00 PM - 9:00 PM\nFriday: Closed",
+        default="Saturday - Thursday: 9:00 AM - 1:00 PM, 4:00 PM - 8:00 PM\nFriday: Closed",
         help_text="One line per entry.",
     )
 
@@ -82,15 +82,16 @@ class SiteSettings(SingletonModel):
     # Store configuration
     currency_code = models.CharField(max_length=3, default="QAR")
     delivery_fee = models.DecimalField(
-        max_digits=8, decimal_places=2, default=Decimal("20.00"), validators=[MinValueValidator(0)]
+        max_digits=8, decimal_places=2, default=Decimal("0.00"), validators=[MinValueValidator(0)],
+        help_text="0 = free delivery."
     )
     free_delivery_threshold = models.DecimalField(
         "Free delivery for orders above",
         max_digits=8,
         decimal_places=2,
-        default=Decimal("200.00"),
+        default=Decimal("0.00"),
         validators=[MinValueValidator(0)],
-        help_text="Set to 0 to disable free delivery.",
+        help_text="Only used when a delivery fee is set. 0 = no threshold.",
     )
     tax_rate_percent = models.DecimalField(
         "Tax / VAT rate (%)",
@@ -117,19 +118,19 @@ class SiteSettings(SingletonModel):
     announcement_bar = models.CharField(
         max_length=200,
         blank=True,
-        default="Free collection & delivery within Doha | Special photocopy rates for schools, colleges and corporate offices",
+        default="Free collection & delivery across Doha | Special photocopy rates for schools, colleges and corporate offices",
     )
     about_text = models.TextField(
         default=(
-            "Venture Arabia Trading Services has been an authorised Trodat stamps dealer in Qatar since 2009. "
+            "Venture Arabia Trading Services has been a Trodat stamps dealer in Qatar since 2009. "
             "We manufacture all types of rubber and self-inking stamps, supply computer toners and accessories, "
-            "and provide printing, photocopying, laminating and binding services with free collection and delivery."
+            "and provide printing, photocopying, laminating and binding services with free collection and delivery across Doha."
         )
     )
     footer_text = models.CharField(max_length=250, blank=True, default="All prices are in Qatari Riyal (QAR).")
     meta_description = models.CharField(
         max_length=160,
-        default="Trodat stamps, rubber stamps, toners, printing, photocopying, laminating and binding in Doha, Qatar. Free collection and delivery.",
+        default="Trodat stamps, rubber stamps, toners, printing, photocopying, laminating and binding in Doha, Qatar. Delivery across Doha.",
     )
 
     class Meta:

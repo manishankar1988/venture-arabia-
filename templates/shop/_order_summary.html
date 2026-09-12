@@ -13,16 +13,17 @@
     <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
     <tbody>
     {% for item in order.items.all %}
-      <tr><td>{{ item.product_name }} <span class="muted small">({{ item.sku }})</span>{% if item.custom_text %}<div class="small muted" style="white-space:pre-line">{{ item.custom_text }}</div>{% endif %}</td><td>{{ item.quantity }}</td><td>{{ order.currency }} {{ item.unit_price|floatformat:2 }}</td><td>{{ order.currency }} {{ item.line_total|floatformat:2 }}</td></tr>
+      <tr><td>{{ item.product_name }} <span class="muted small">({{ item.sku }})</span>{% if item.custom_text %}<div class="small muted" style="white-space:pre-line">{{ item.custom_text }}</div>{% endif %}</td><td>{{ item.quantity }}</td><td>{% if item.has_price %}{{ order.currency }} {{ item.unit_price|floatformat:2 }}{% else %}<span class="muted">On request</span>{% endif %}</td><td>{% if item.has_price %}{{ order.currency }} {{ item.line_total|floatformat:2 }}{% else %}<span class="muted">To be confirmed</span>{% endif %}</td></tr>
     {% endfor %}
     </tbody>
     <tfoot>
       <tr><td colspan="3" style="text-align:right">Subtotal</td><td>{{ order.currency }} {{ order.subtotal|floatformat:2 }}</td></tr>
       <tr><td colspan="3" style="text-align:right">Delivery</td><td>{% if order.delivery_fee == 0 %}Free{% else %}{{ order.currency }} {{ order.delivery_fee|floatformat:2 }}{% endif %}</td></tr>
       {% if order.tax_amount %}<tr><td colspan="3" style="text-align:right">Tax ({{ order.tax_rate_percent }}%)</td><td>{{ order.currency }} {{ order.tax_amount|floatformat:2 }}</td></tr>{% endif %}
-      <tr><td colspan="3" style="text-align:right"><strong>Total</strong></td><td><strong>{{ order.currency }} {{ order.total|floatformat:2 }}</strong></td></tr>
+      <tr><td colspan="3" style="text-align:right"><strong>Total{% if order.has_unpriced_items %} (priced items){% endif %}</strong></td><td><strong>{{ order.currency }} {{ order.total|floatformat:2 }}</strong></td></tr>
     </tfoot>
   </table>
+  {% if order.has_unpriced_items %}<p class="small muted" style="margin-top:.6rem">Items marked "on request" are priced when we confirm your order; we will call or WhatsApp you with the final amount before production.</p>{% endif %}
   <div class="grid grid-2" style="margin-top:1.2rem">
     <div><h3>Delivery</h3><p>{{ order.get_delivery_method_display }}<br>{{ order.delivery_address }}{% if order.delivery_notes %}<br><span class="muted small">{{ order.delivery_notes }}</span>{% endif %}</p></div>
     <div><h3>Payment</h3><p>{{ order.get_payment_method_display }} · <span class="order-status">{{ order.get_payment_status_display }}</span></p>

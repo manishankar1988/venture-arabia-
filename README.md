@@ -1,7 +1,7 @@
 # Venture Arabia Trading Services – E-commerce Website
 
 A secure, mobile-friendly online shop and content management system for
-**Venture Arabia Trading Services**, Salwa Road, Doha, Qatar – authorised Trodat
+**Venture Arabia Trading Services**, Salwa Road, Doha, Qatar – Trodat
 stamps dealer since 2009, supplier of computer toners and accessories, and
 provider of printing, photocopying, laminating and binding services.
 
@@ -100,7 +100,7 @@ Log in at `/manage/` (the path is set by `ADMIN_URL` in `.env`).
 Tips
 * Product photos and sample impressions were cropped from the Trodat dealer catalogue (`docs/trodat-catalogue.pdf`) and live in `media/products/`. Replace them with your own photos any time from the product page in the admin (square images, at least 800 × 800 px). Toner and paper items have no catalogue photo yet.
 * Untick *Track stock* for made-to-order items (stamps). Tick it for cartridges, pads and paper so stock counts down automatically.
-* The seeded **prices are placeholders** – update every product price before going live.
+* **Stamps and services show no price** ("Price on request") as requested by the company; the price is confirmed with the customer before production. Consumables (cartridges, pads, ink, paper, toner) carry placeholder prices – update them, or clear a price to show "Price on request".
 
 ---
 
