@@ -4,6 +4,7 @@ Run with:  python manage.py test
 """
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.management import call_command
@@ -16,7 +17,15 @@ from cms.models import Page
 from shop.models import Order
 
 
-@override_settings(SECURE_SSL_REDIRECT=False, AXES_ENABLED=False)
+@override_settings(
+    SECURE_SSL_REDIRECT=False,
+    AXES_ENABLED=False,
+    # Tests must not depend on a collectstatic run having produced the WhiteNoise manifest.
+    STORAGES={
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    },
+)
 class SiteTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -45,7 +54,7 @@ class SiteTests(TestCase):
     def test_404_and_protected_pages(self):
         self.assertEqual(self.client.get("/does-not-exist/").status_code, 404)
         self.assertEqual(self.client.get("/shop/my-orders/").status_code, 302)
-        self.assertEqual(self.client.get("/manage/").status_code, 302)
+        self.assertEqual(self.client.get("/" + settings.ADMIN_URL).status_code, 302)
 
     def test_security_headers(self):
         response = self.client.get("/")
@@ -169,16 +178,16 @@ class SiteTests(TestCase):
         })
         order = Order.objects.get()
         self.client.force_login(self.admin)
-        for url in [
-            "/manage/", "/manage/catalog/product/", "/manage/catalog/product/add/", "/manage/catalog/category/",
-            "/manage/catalog/service/", "/manage/catalog/quoterequest/", "/manage/cms/page/", "/manage/cms/homebanner/",
-            "/manage/cms/contactmessage/", "/manage/cms/sitesettings/1/change/", "/manage/shop/order/",
-            f"/manage/shop/order/{order.pk}/change/",
+        admin = "/" + settings.ADMIN_URL
+        for path in [
+            "", "catalog/product/", "catalog/product/add/", "catalog/category/", "catalog/service/",
+            "catalog/quoterequest/", "cms/page/", "cms/homebanner/", "cms/contactmessage/",
+            "cms/sitesettings/1/change/", "shop/order/", f"shop/order/{order.pk}/change/",
         ]:
-            with self.subTest(url=url):
-                self.assertEqual(self.client.get(url).status_code, 200)
-        export = self.client.post("/manage/shop/order/", {"action": "export_csv", "_selected_action": [order.pk]})
+            with self.subTest(url=admin + path):
+                self.assertEqual(self.client.get(admin + path).status_code, 200)
+        export = self.client.post(admin + "shop/order/", {"action": "export_csv", "_selected_action": [order.pk]})
         self.assertIn(order.number.encode(), export.content)
-        self.client.post("/manage/shop/order/", {"action": "mark_confirmed", "_selected_action": [order.pk]})
+        self.client.post(admin + "shop/order/", {"action": "mark_confirmed", "_selected_action": [order.pk]})
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.CONFIRMED)
