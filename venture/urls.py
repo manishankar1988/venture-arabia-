@@ -2,8 +2,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
+from django.views.static import serve as serve_media
 
 from cms.sitemaps import SITEMAPS
 
@@ -27,6 +28,8 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.SERVE_MEDIA:
+    urlpatterns += [re_path(r"^media/(?P<path>.*)$", serve_media, {"document_root": settings.MEDIA_ROOT})]
 
 handler404 = "cms.views.error_404"
 handler500 = "cms.views.error_500"

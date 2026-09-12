@@ -1,0 +1,74 @@
+# Full production stack: PostgreSQL + Django/Gunicorn + Nginx (HTTPS via certbot volumes).
+#
+#   cd deploy
+#   cp ../.env.production.example ../.env      # fill in SECRET_KEY, domain, email, DB password
+#   docker compose up -d --build
+#   docker compose exec web python manage.py seed_demo
+#   docker compose exec web python manage.py attach_catalogue_images
+#   docker compose exec web python manage.py createsuperuser
+#
+# Set POSTGRES_PASSWORD in ../.env and use the same value in DATABASE_URL:
+#   DATABASE_URL=postgres://venture:<password>@db:5432/venture
+#   BEHIND_PROXY=1  FORCE_HTTPS=0 (Nginx redirects)  SERVE_MEDIA=0
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: venture
+      POSTGRES_USER: venture
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in ../.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U venture -d venture"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    env_file: ../.env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media:/app/media
+      - static:/app/staticfiles
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - media:/srv/media:ro
+      - static:/srv/static:ro
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
+  # One-off certificate issue / renewal, e.g.:
+  # docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d venturearabia.qa -d www.venturearabia.qa
+  certbot:
+    image: certbot/certbot
+    profiles: ["tools"]
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
+volumes:
+  pgdata:
+  media:
+  static:
+  certbot-etc:
+  certbot-www:

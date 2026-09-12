@@ -8,3 +8,8 @@ staticfiles/
 *.log
 .DS_Store
 Thumbs.db
+.env.*
+!.env.example
+!.env.production.example
+backups/
+logs/

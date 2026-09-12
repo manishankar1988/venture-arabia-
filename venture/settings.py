@@ -12,7 +12,8 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+# ENV_FILE lets you point at another env file, e.g. .env.production for a local production-mode run.
+load_dotenv(os.getenv("ENV_FILE") or BASE_DIR / ".env")
 
 
 def env_bool(name: str, default: bool = False) -> bool:
@@ -170,6 +171,9 @@ STORAGES = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Let Django serve uploaded files itself (small Windows/single-server deployments).
+# On Linux with Nginx leave this at 0 and let Nginx serve /media/.
+SERVE_MEDIA = env_bool("SERVE_MEDIA", False)
 
 # Upload limits (bytes)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
@@ -210,7 +214,9 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # FORCE_HTTPS=0 only when a proxy in front of the app already redirects to HTTPS
+    # (or for a local production-mode test on plain HTTP).
+    SECURE_SSL_REDIRECT = env_bool("FORCE_HTTPS", True)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365

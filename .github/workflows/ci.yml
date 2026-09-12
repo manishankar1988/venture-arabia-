@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: venture
+          POSTGRES_USER: venture
+          POSTGRES_PASSWORD: venture
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U venture"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      SECRET_KEY: ci-only-secret-key
+      DEBUG: "0"
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      DATABASE_URL: postgres://venture:venture@127.0.0.1:5432/venture
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Django checks (production settings)
+        run: python manage.py check --deploy
+      - name: Migrations are up to date
+        run: python manage.py makemigrations --check --dry-run
+      - name: Tests
+        run: python manage.py test --verbosity 2
+      - name: Docker image builds
+        run: docker build -f deploy/Dockerfile -t venture-arabia:ci .

@@ -21,6 +21,8 @@ quotes, and edit every page of text on the site without touching code.
 | Qatar-specific | QAR currency, Asia/Qatar timezone, +974 phone validation, Qatar zone/street address fields, no VAT by default (configurable), starter legal pages referencing Qatari law, seller identification in footer and emails |
 | Security | HTTPS redirect + HSTS in production, secure/HttpOnly/SameSite cookies, CSRF protection, Content-Security-Policy, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy, PBKDF2 password hashing, strong password rules, login brute-force lockout (django-axes), upload type/size validation, honeypot spam protection, obscured admin URL, environment-based secrets |
 | SEO | Clean URLs, meta descriptions, Open Graph tags, product structured data (schema.org), XML sitemap, robots.txt |
+| Quality | Automated end-to-end tests (`python manage.py test`), GitHub Actions CI (deploy checks, migrations, tests, Docker build) |
+| Deployment | Docker Compose stack (PostgreSQL + Gunicorn + Nginx + certbot), systemd unit, Nginx config, deploy and backup scripts in `deploy/`; Windows production server via `serve.ps1` |
 
 ---
 
@@ -45,7 +47,8 @@ python manage.py createsuperuser          # your admin login
 python manage.py runserver
 ```
 
-Or simply run `.un.ps1`, which does all of the above (including starting PostgreSQL) and launches the site.
+Or simply run `.
+un.ps1`, which does all of the above (including starting PostgreSQL) and launches the site.
 
 Open <http://127.0.0.1:8000/> for the shop and <http://127.0.0.1:8000/manage/> for the admin panel.
 
@@ -70,7 +73,11 @@ git push -u origin main
 ```
 
 Commit your changes regularly with `git add -A` and `git commit -m "describe the change"`.
-Never commit `.env`.
+Never commit `.env` or `.env.production`.
+
+Every push to `main` runs the GitHub Actions workflow in `.github/workflows/ci.yml`:
+production settings check, migration check, the test suite against PostgreSQL 17 and a
+Docker image build. Run the same tests locally with `python manage.py test`.
 
 ---
 
@@ -107,48 +114,57 @@ Cloud Doha, or a Qatari provider such as Ooredoo Cloud / Meeza). Register a
 `.qa` domain through a registrar accredited by the Communications Regulatory
 Authority (CRA).
 
-### 4.2 Server setup (Ubuntu example)
-```bash
-sudo apt update && sudo apt install -y python3-venv python3-pip nginx postgresql
-sudo -u postgres createuser venture -P && sudo -u postgres createdb -O venture venture
-git clone <your-repo> /srv/venture && cd /srv/venture
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env && nano .env      # see 4.3
-python manage.py migrate
-python manage.py seed_demo
-python manage.py attach_catalogue_images
-python manage.py createsuperuser
-python manage.py collectstatic --noinput
-python manage.py check --deploy         # must report no warnings
-```
+### 4.2 Three ways to run the production version
 
-Run with Gunicorn behind Nginx (Nginx terminates HTTPS and serves `/media/`):
+All of them use the same code from git and the same `.env` values (section 4.3).
+`python manage.py check --deploy` must report no warnings before you go live.
+
+**A. Docker Compose (recommended – one command on any Linux server)**
 ```bash
-gunicorn venture.wsgi:application --bind 127.0.0.1:8000 --workers 3
+git clone <your-repo> venture && cd venture
+cp .env.production.example .env && nano .env      # SECRET_KEY, domain, DB password, email
+echo "POSTGRES_PASSWORD=<same password as in DATABASE_URL>" >> .env
+cd deploy
+docker compose up -d --build
+docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d venturearabia.qa -d www.venturearabia.qa
+docker compose restart nginx
+docker compose exec web python manage.py seed_demo
+docker compose exec web python manage.py attach_catalogue_images
+docker compose exec web python manage.py createsuperuser
 ```
-Example Nginx server block:
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name venturearabia.qa www.venturearabia.qa;
-    ssl_certificate     /etc/letsencrypt/live/venturearabia.qa/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/venturearabia.qa/privkey.pem;
-    client_max_body_size 6M;
-    location /media/  { alias /srv/venture/media/; expires 30d; }
-    location /static/ { alias /srv/venture/staticfiles/; expires 365d; }
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-server { listen 80; server_name venturearabia.qa www.venturearabia.qa; return 301 https://$host$request_uri; }
+In `.env` use `DATABASE_URL=postgres://venture:<password>@db:5432/venture`, `BEHIND_PROXY=1`,
+`FORCE_HTTPS=0` (Nginx redirects) and `SERVE_MEDIA=0` (Nginx serves media).
+Update later with `git pull && docker compose up -d --build`.
+
+**B. Plain Ubuntu server (systemd + Nginx)**
+```bash
+sudo apt update && sudo apt install -y python3-venv python3-pip nginx postgresql certbot python3-certbot-nginx
+sudo -u postgres createuser venture -P && sudo -u postgres createdb -O venture venture
+sudo useradd -m -d /srv/venture venture && sudo -u venture git clone <your-repo> /srv/venture
+cd /srv/venture && sudo -u venture python3 -m venv .venv && sudo -u venture .venv/bin/pip install -r requirements.txt
+sudo -u venture cp .env.production.example .env && sudo -u venture nano .env
+sudo -u venture mkdir -p logs backups
+sudo -u venture .venv/bin/python manage.py migrate
+sudo -u venture .venv/bin/python manage.py seed_demo
+sudo -u venture .venv/bin/python manage.py attach_catalogue_images
+sudo -u venture .venv/bin/python manage.py createsuperuser
+sudo -u venture .venv/bin/python manage.py collectstatic --noinput
+sudo cp deploy/gunicorn.service /etc/systemd/system/venture.service && sudo systemctl enable --now venture
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/venture   # edit: upstream 127.0.0.1:8000, /srv/venture/staticfiles, /srv/venture/media
+sudo ln -s /etc/nginx/sites-available/venture /etc/nginx/sites-enabled/ && sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d venturearabia.qa -d www.venturearabia.qa
 ```
-Get a free TLS certificate with `certbot --nginx`. Create a `systemd` service for
-Gunicorn so it restarts automatically, and schedule daily backups of the
-PostgreSQL database and the `media/` folder.
+Later updates: `bash deploy/deploy.sh` (pulls from git, migrates, collects static, restarts).
+Nightly backups: add `deploy/backup.sh` to cron as shown inside the script.
+
+**C. Windows server or a local production-mode test (Waitress)**
+```powershell
+copy .env.production.example .env.production      # then edit
+.\serve.ps1                                       # check --deploy, migrate, collectstatic, serve on :8000
+```
+For a local test on plain HTTP set `ALLOWED_HOSTS=localhost,127.0.0.1`, `FORCE_HTTPS=0`
+and `SERVE_MEDIA=1` in `.env.production`. On a real Windows server put IIS or another
+reverse proxy with HTTPS in front and keep `FORCE_HTTPS=1`, `BEHIND_PROXY=1`.
 
 ### 4.3 Production `.env`
 ```
@@ -166,6 +182,8 @@ EMAIL_USE_TLS=1
 DEFAULT_FROM_EMAIL=Venture Arabia <venture@venture.com.qa>
 ORDER_NOTIFICATION_EMAIL=venture@venture.com.qa
 BEHIND_PROXY=1
+FORCE_HTTPS=1
+SERVE_MEDIA=0
 ```
 With `DEBUG=0` the site forces HTTPS, enables HSTS, marks cookies *Secure* and
 refuses to start without a `SECRET_KEY`.
@@ -214,6 +232,9 @@ templates/      HTML templates (base.html = layout)
 static/         css/site.css, js/site.js, favicon
 media/          product/category/banner images from the catalogue; customer uploads go to media/quotes (ignored by git)
 docs/           the Trodat dealer catalogue PDF the images were taken from
+deploy/         Dockerfile, docker-compose.yml, nginx.conf, gunicorn.service, deploy.sh, backup.sh
+serve.ps1       production-mode server for Windows (Waitress)
+shop/tests.py   end-to-end test suite
 ```
 
 Useful commands: `python manage.py check --deploy`, `python manage.py collectstatic`,

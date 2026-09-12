@@ -31,13 +31,22 @@ switch ($Action) {
         Set-Content -Path $pw -Value "postgres" -Encoding ascii -NoNewline
         & (Join-Path $Bin "initdb.exe") -D $DataDir -U postgres --pwfile=$pw -E UTF8 --locale=C -A scram-sha-256
         Remove-Item $pw
-        & (Join-Path $Bin "pg_ctl.exe") -D $DataDir -l $LogFile -o "-p $Port" -w start
-        & (Join-Path $Bin "psql.exe") -U postgres -h 127.0.0.1 -p $Port -c "CREATE ROLE venture LOGIN PASSWORD 'venture';"
+        Start-Process -FilePath (Join-Path $Bin "pg_ctl.exe") -ArgumentList @("-D", $DataDir, "-l", $LogFile, "-o", "`"-p $Port`"", "-w", "start") -WindowStyle Hidden -Wait
+        Start-Sleep -Seconds 2
+        & (Join-Path $Bin "psql.exe") -U postgres -h 127.0.0.1 -p $Port -c "CREATE ROLE venture LOGIN CREATEDB PASSWORD 'venture';"
         & (Join-Path $Bin "psql.exe") -U postgres -h 127.0.0.1 -p $Port -c "CREATE DATABASE venture OWNER venture ENCODING 'UTF8';"
         Write-Host "Database 'venture' created. DATABASE_URL=postgres://venture:venture@127.0.0.1:$Port/venture" -ForegroundColor Green
     }
     "start" {
-        & (Join-Path $Bin "pg_ctl.exe") -D $DataDir -l $LogFile -o "-p $Port" -w start
+        $st = & (Join-Path $Bin "pg_ctl.exe") -D $DataDir status 2>&1
+        if ("$st" -match "server is running") {
+            Write-Host "PostgreSQL is already running on port $Port." -ForegroundColor Green
+        } else {
+            $log = Join-Path (Split-Path $LogFile) ("postgres-" + (Get-Date -Format "yyyyMMdd") + ".log")
+            Start-Process -FilePath (Join-Path $Bin "pg_ctl.exe") -ArgumentList @("-D", $DataDir, "-l", $log, "-o", "`"-p $Port`"", "-w", "start") -WindowStyle Hidden -Wait
+            Start-Sleep -Seconds 2
+            & (Join-Path $Bin "pg_ctl.exe") -D $DataDir status | Select-Object -First 1
+        }
     }
     "stop" {
         & (Join-Path $Bin "pg_ctl.exe") -D $DataDir -m fast -w stop
