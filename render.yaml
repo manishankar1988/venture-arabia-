@@ -48,7 +48,7 @@ services:
           name: venture-arabia-db
           property: connectionString
       - key: DB_SSLMODE
-        value: "require"
+        value: "prefer"
       - key: BEHIND_PROXY
         value: "1"
       - key: FORCE_HTTPS
