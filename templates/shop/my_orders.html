@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'accounts:profile' %}">Account</a></span><span>My orders</span></nav><h1>My orders</h1></div></div>
+<div class="container section">
+  {% if orders %}
+  <table class="data-table">
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr><td><strong>{{ o.number }}</strong></td><td>{{ o.created_at|date:"j M Y" }}</td><td>{{ o.items.count }}</td><td>{{ o.currency }} {{ o.total|floatformat:2 }}</td><td><span class="order-status">{{ o.get_status_display }}</span></td><td><a href="{% url 'shop:my_order_detail' o.number %}" class="btn btn-sm btn-outline">View</a></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty"><h2>No orders yet</h2><p class="muted">When you place an order it will appear here.</p><a href="{% url 'catalog:product_list' %}" class="btn">Browse products</a></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Track your order{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span>Track order</span></nav><h1>Track your order</h1></div></div>
+<div class="container section">
+  <div class="narrow auth-card" style="margin-bottom:2rem">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "_form_fields.html" with form=form %}
+      <button type="submit" class="btn btn-block">Find my order</button>
+    </form>
+    {% if user.is_authenticated %}<p class="small muted" style="margin-top:1rem;text-align:center"><a href="{% url 'shop:my_orders' %}">View all my orders</a></p>{% endif %}
+  </div>
+  {% if order %}{% include "shop/_order_summary.html" with status_index=order|status_index %}{% endif %}
+</div>
+{% endblock %}

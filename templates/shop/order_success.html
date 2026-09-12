@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Order {{ order.number }} confirmed{% endblock %}
+{% block content %}
+<div class="container section">
+  <div style="text-align:center;margin-bottom:2rem">
+    <div style="width:64px;height:64px;border-radius:50%;background:#ecfdf5;color:var(--success);display:grid;place-items:center;margin:0 auto 1rem"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg></div>
+    <h1>Thank you, {{ order.full_name }}!</h1>
+    <p class="muted">Your order <strong>{{ order.number }}</strong> has been received. We have sent a confirmation to {{ order.email }} and will contact you on {{ order.phone }} to confirm.</p>
+  </div>
+  {% include "shop/_order_summary.html" with status_index=order|status_index %}
+  <div style="text-align:center;margin-top:1.5rem">
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-outline">Continue shopping</a>
+    {% if site.whatsapp_link %}<a href="{{ site.whatsapp_link }}?text=Hello%2C%20I%20placed%20order%20{{ order.number }}" class="btn" target="_blank" rel="noopener">Message us on WhatsApp</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

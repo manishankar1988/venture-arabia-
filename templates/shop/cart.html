@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Your cart{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span>Cart</span></nav><h1>Your cart</h1></div></div>
+<div class="container">
+{% if cart.is_empty %}
+  <div class="empty" style="margin:2rem 0"><h2>Your cart is empty</h2><p class="muted">Browse our Trodat stamps, toners and supplies.</p><a href="{% url 'catalog:product_list' %}" class="btn">Start shopping</a></div>
+{% else %}
+<div class="cart-layout">
+  <div>
+    <table class="cart-table">
+      <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+      <tbody>
+      {% for item in cart %}
+        <tr>
+          <td>
+            <div class="cart-item">
+              {% if item.product.image %}<img class="thumb" src="{{ item.product.image.url }}" alt="">{% else %}<div class="thumb ph" style="font-size:.8rem">{{ item.product.sku }}</div>{% endif %}
+              <div>
+                <a href="{{ item.product.get_absolute_url }}"><strong>{{ item.product.name }}</strong></a>
+                <div class="small muted">Model {{ item.product.sku }}</div>
+                {% if item.custom_text %}<div class="custom">{{ item.custom_text }}</div>{% endif %}
+              </div>
+            </div>
+          </td>
+          <td data-label="Price">{{ CURRENCY }} {{ item.unit_price|floatformat:2 }}</td>
+          <td data-label="Qty">
+            <form method="post" action="{% url 'shop:cart_update' item.key %}" class="qty">
+              {% csrf_token %}
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="99" aria-label="Quantity">
+              <button type="submit" class="btn btn-outline btn-sm">Update</button>
+            </form>
+          </td>
+          <td data-label="Total"><strong>{{ CURRENCY }} {{ item.line_total|floatformat:2 }}</strong></td>
+          <td>
+            <form method="post" action="{% url 'shop:cart_remove' item.key %}">{% csrf_token %}<button type="submit" class="btn btn-outline btn-sm" aria-label="Remove">✕</button></form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p style="margin-top:1rem"><a href="{% url 'catalog:product_list' %}">‹ Continue shopping</a></p>
+  </div>
+  <aside class="summary">
+    <h3>Order summary</h3>
+    <dl>
+      <dt>Subtotal</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
+      <dt>Delivery (Doha)</dt><dd>{% if delivery_fee == 0 %}Free{% else %}{{ CURRENCY }} {{ delivery_fee|floatformat:2 }}{% endif %}</dd>
+      <div class="total" style="display:contents"><dt>Estimated total</dt><dd>{{ CURRENCY }} {{ estimated_total|floatformat:2 }}</dd></div>
+    </dl>
+    {% if delivery_fee != 0 and site.free_delivery_threshold %}<p class="small muted">Free delivery on orders over {{ CURRENCY }} {{ site.free_delivery_threshold|floatformat:0 }}. Collection from our office is always free.</p>{% endif %}
+    <a href="{% url 'shop:checkout' %}" class="btn btn-block">Proceed to checkout</a>
+    <p class="small muted" style="margin-top:.8rem;text-align:center">Cash or card on delivery · Bank transfer</p>
+  </aside>
+</div>
+{% endif %}
+</div>
+{% endblock %}

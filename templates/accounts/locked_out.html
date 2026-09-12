@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Too many login attempts{% endblock %}
+{% block content %}
+<div class="container section"><div class="narrow auth-card" style="text-align:center">
+  <h1>Account temporarily locked</h1>
+  <p class="muted">Too many failed login attempts. For your security, please wait one hour before trying again, or reset your password.</p>
+  <a href="{% url 'accounts:password_reset' %}" class="btn btn-outline">Reset password</a>
+</div></div>
+{% endblock %}

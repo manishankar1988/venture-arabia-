@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Page not found{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="empty">
+    <h1>Page not found</h1>
+    <p class="muted">The page you are looking for does not exist or has been moved.</p>
+    <a href="{% url 'cms:home' %}" class="btn">Back to home</a>
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-outline">Browse products</a>
+  </div>
+</div>
+{% endblock %}

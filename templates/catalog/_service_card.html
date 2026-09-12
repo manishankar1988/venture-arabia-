@@ -1,0 +1,11 @@
+<article class="card service-card">
+  <div class="service-icon">{% include "catalog/_service_icon.html" with icon=service.icon %}</div>
+  <h3><a href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
+  <p class="muted" style="margin-bottom:.6rem">{{ service.short_description }}</p>
+  {% if service.starting_price %}<div class="price-from">From <strong class="price">{{ CURRENCY }} {{ service.starting_price|floatformat:2 }}</strong> {{ service.price_unit }}</div>{% endif %}
+  {% if service.turnaround %}<div class="muted small">Turnaround: {{ service.turnaround }}</div>{% endif %}
+  <div class="card-footer" style="padding-top:1rem">
+    <a href="{{ service.get_absolute_url }}" class="btn btn-sm btn-outline">Details</a>
+    <a href="{% url 'catalog:quote_request' %}?service={{ service.slug }}" class="btn btn-sm">Get a quote</a>
+  </div>
+</article>

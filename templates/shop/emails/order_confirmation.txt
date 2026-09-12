@@ -1,0 +1,40 @@
+Dear {{ order.full_name }},
+
+Thank you for your order with {{ site.company_name }}.
+
+ORDER NUMBER: {{ order.number }}
+Date: {{ order.created_at|date:"j F Y, H:i" }}
+Status: {{ order.get_status_display }}
+
+ITEMS
+{% for item in order.items.all %}- {{ item.quantity }} x {{ item.product_name }} ({{ item.sku }}) @ {{ order.currency }} {{ item.unit_price }} = {{ order.currency }} {{ item.line_total }}{% if item.custom_text %}
+  Custom text: {{ item.custom_text }}{% endif %}
+{% endfor %}
+Subtotal: {{ order.currency }} {{ order.subtotal }}
+Delivery: {{ order.currency }} {{ order.delivery_fee }}{% if order.tax_amount %}
+Tax ({{ order.tax_rate_percent }}%): {{ order.currency }} {{ order.tax_amount }}{% endif %}
+TOTAL: {{ order.currency }} {{ order.total }}
+
+DELIVERY
+{{ order.get_delivery_method_display }}
+{{ order.delivery_address }}
+{% if order.delivery_notes %}Notes: {{ order.delivery_notes }}{% endif %}
+
+PAYMENT
+{{ order.get_payment_method_display }} - {{ order.get_payment_status_display }}
+{% if order.payment_method == "bank_transfer" %}
+Bank: {{ site.bank_name }}
+Account name: {{ site.bank_account_name }}
+IBAN: {{ site.bank_iban }}
+Reference: {{ order.number }}
+{{ site.bank_instructions }}
+{% endif %}
+We will contact you on {{ order.phone }} to confirm the order. For custom stamps we will send a proof for approval before production.
+
+You can track this order at any time using your order number and phone number.
+
+{{ site.company_name }}
+{{ site.full_address }}
+Tel: {{ site.phone }} | Mobile: {{ site.mobile_1 }}
+Email: {{ site.email }}
+{% if site.commercial_registration %}CR No. {{ site.commercial_registration }}{% endif %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Order {{ order.number }}{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'shop:my_orders' %}">My orders</a></span><span>{{ order.number }}</span></nav><h1>Order {{ order.number }}</h1></div></div>
+<div class="container section">
+  {% include "shop/_order_summary.html" with status_index=order|status_index %}
+  <p><a href="{% url 'shop:my_orders' %}">‹ Back to my orders</a></p>
+</div>
+{% endblock %}

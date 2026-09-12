@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'shop:cart' %}">Cart</a></span><span>Checkout</span></nav><h1>Checkout</h1></div></div>
+<form method="post" class="container cart-layout" novalidate>
+  {% csrf_token %}
+  {{ form.website }}
+  <div>
+    {% if form.non_field_errors %}<div class="alert alert-error" style="margin-bottom:1rem">{{ form.non_field_errors }}</div>{% endif %}
+    {% if not user.is_authenticated %}<p class="small muted">Already have an account? <a href="{% url 'accounts:login' %}?next={% url 'shop:checkout' %}">Log in</a> to auto-fill your details.</p>{% endif %}
+
+    <section class="checkout-section">
+      <h2><span class="step">1</span> Your details</h2>
+      <div class="form-grid">
+        <div class="form-row"><label for="{{ form.full_name.id_for_label }}">Full name *</label>{{ form.full_name }}{{ form.full_name.errors }}</div>
+        <div class="form-row"><label for="{{ form.company.id_for_label }}">Company</label>{{ form.company }}{{ form.company.errors }}</div>
+        <div class="form-row"><label for="{{ form.email.id_for_label }}">Email *</label>{{ form.email }}{{ form.email.errors }}</div>
+        <div class="form-row"><label for="{{ form.phone.id_for_label }}">Mobile number *</label>{{ form.phone }}<div class="help">We will call or WhatsApp this number to confirm your order.</div>{{ form.phone.errors }}</div>
+      </div>
+    </section>
+
+    <section class="checkout-section">
+      <h2><span class="step">2</span> Delivery or collection</h2>
+      <ul class="radio-list">{% for radio in form.delivery_method %}<li>{{ radio }}</li>{% endfor %}</ul>
+      {{ form.delivery_method.errors }}
+      <div id="address-block" style="margin-top:1rem">
+        <div class="form-grid">
+          <div class="form-row full"><label for="{{ form.building.id_for_label }}">Building / villa / office *</label>{{ form.building }}{{ form.building.errors }}</div>
+          <div class="form-row"><label for="{{ form.zone.id_for_label }}">Zone *</label>{{ form.zone }}{{ form.zone.errors }}</div>
+          <div class="form-row"><label for="{{ form.street.id_for_label }}">Street *</label>{{ form.street }}{{ form.street.errors }}</div>
+          <div class="form-row"><label for="{{ form.area.id_for_label }}">Area *</label>{{ form.area }}{{ form.area.errors }}</div>
+          <div class="form-row"><label for="{{ form.city.id_for_label }}">City</label>{{ form.city }}{{ form.city.errors }}</div>
+          <div class="form-row full"><label for="{{ form.delivery_notes.id_for_label }}">Delivery notes</label>{{ form.delivery_notes }}{{ form.delivery_notes.errors }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="checkout-section">
+      <h2><span class="step">3</span> Payment</h2>
+      <ul class="radio-list">{% for radio in form.payment_method %}<li>{{ radio }}</li>{% endfor %}</ul>
+      {{ form.payment_method.errors }}
+      <p class="help" style="margin-top:.8rem">No payment is taken online. You pay in cash or by card when your order is delivered or collected, or by bank transfer after we confirm your order. Bank details will be shown on the confirmation page.</p>
+    </section>
+
+    <section class="checkout-section">
+      <h2><span class="step">4</span> Confirm</h2>
+      <div class="form-row"><label class="checkbox">{{ form.accepted_terms }} <span>I have read and agree to the <a href="/pages/terms-and-conditions/" target="_blank">Terms &amp; Conditions</a>, <a href="/pages/privacy-policy/" target="_blank">Privacy Policy</a> and <a href="/pages/returns-and-refunds/" target="_blank">Returns Policy</a>. *</span></label>{{ form.accepted_terms.errors }}</div>
+      {% if not user.is_authenticated %}<div class="form-row"><label class="checkbox">{{ form.create_account }} <span>{{ form.create_account.label }}</span></label></div>{% endif %}
+      <button type="submit" class="btn btn-block">Place order</button>
+    </section>
+  </div>
+
+  <aside class="summary">
+    <h3>Your order</h3>
+    <ul class="plain">
+      {% for item in cart %}<li style="display:flex;justify-content:space-between;gap:.5rem;font-size:.9rem"><span>{{ item.quantity }} × {{ item.product.name }}</span><span>{{ CURRENCY }} {{ item.line_total|floatformat:2 }}</span></li>{% endfor %}
+    </ul>
+    <dl>
+      <dt>Subtotal</dt><dd>{{ CURRENCY }} {{ subtotal|floatformat:2 }}</dd>
+      <dt>Delivery</dt><dd>{% if delivery_fee == 0 %}Free{% else %}{{ CURRENCY }} {{ delivery_fee|floatformat:2 }}{% endif %}</dd>
+      {% if tax %}<dt>Tax ({{ site.tax_rate_percent }}%)</dt><dd>{{ CURRENCY }} {{ tax|floatformat:2 }}</dd>{% endif %}
+    </dl>
+    <p class="small muted">The final total is confirmed on the next page. Collection from our office is free of delivery charges.</p>
+    <p class="small muted"><a href="{% url 'shop:cart' %}">‹ Edit cart</a></p>
+  </aside>
+</form>
+{% endblock %}

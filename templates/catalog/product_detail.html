@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} ({{ product.sku }}){% endblock %}
+{% block meta_description %}{{ product.short_description|default:product.description|truncatechars:160 }}{% endblock %}
+{% block og_title %}{{ product.name }}{% endblock %}
+{% block head %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"{{ product.name|escapejs }}","sku":"{{ product.sku|escapejs }}","brand":{"@type":"Brand","name":"{{ product.brand|escapejs }}"},"description":"{{ product.short_description|escapejs }}","offers":{"@type":"Offer","priceCurrency":"{{ CURRENCY }}","price":"{{ product.price }}","availability":"https://schema.org/{% if product.in_stock %}InStock{% else %}OutOfStock{% endif %}","url":"{{ request.build_absolute_uri }}"}}</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'catalog:product_list' %}">Products</a></span><span><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></span><span>{{ product.name }}</span></nav>
+</div>
+<div class="container product-detail">
+  <div>
+    <div class="gallery-main">
+      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" data-gallery-main>{% else %}<div class="ph" style="font-size:3rem">{{ product.sku }}<small>{{ product.brand }} - image coming soon</small></div>{% endif %}
+    </div>
+    {% if product.images.exists %}
+    <div class="gallery-thumbs">
+      {% if product.image %}<button type="button" class="active" data-gallery-thumb="{{ product.image.url }}"><img src="{{ product.image.url }}" alt=""></button>{% endif %}
+      {% for img in product.images.all %}<button type="button" data-gallery-thumb="{{ img.image.url }}"><img src="{{ img.image.url }}" alt="{{ img.alt_text }}"></button>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="product-info">
+    <span class="sku muted small">{{ product.brand }} · Model {{ product.sku }}</span>
+    <h1>{{ product.name }}</h1>
+    {% if product.short_description %}<p class="muted">{{ product.short_description }}</p>{% endif %}
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:.5rem 0 1rem">
+      <span class="price">{{ CURRENCY }} {{ product.price|floatformat:2 }}{% if product.is_on_sale %}<del>{{ CURRENCY }} {{ product.compare_at_price|floatformat:2 }}</del>{% endif %}</span>
+      {% if product.in_stock %}<span class="stock in">{% if product.track_stock %}In stock{% else %}Made to order{% endif %}</span>{% else %}<span class="stock out">Out of stock</span>{% endif %}
+    </div>
+
+    <div class="buy-box">
+      <form method="post" action="{% url 'shop:cart_add' product.pk %}">
+        {% csrf_token %}
+        {% if product.is_customisable %}
+        <div class="form-row">
+          <label for="custom_text">Stamp text / customisation <span style="color:var(--maroon)">*</span></label>
+          <textarea id="custom_text" name="custom_text" rows="4" maxlength="500" required placeholder="Line 1&#10;Line 2&#10;Line 3"></textarea>
+          <div class="help">{{ product.customisation_help }} You can also email your logo/artwork to {{ site.email }} quoting your order number.</div>
+        </div>
+        {% endif %}
+        <div class="form-row">
+          <label for="quantity">Quantity</label>
+          <div class="qty" data-qty>
+            <button type="button" class="btn btn-outline btn-sm" data-step="down" aria-label="Decrease">−</button>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" max="99" required>
+            <button type="button" class="btn btn-outline btn-sm" data-step="up" aria-label="Increase">+</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-block" {% if not product.in_stock %}disabled{% endif %}>Add to cart</button>
+        <p class="help" style="text-align:center;margin-top:.6rem">Free delivery in Doha for orders over {{ CURRENCY }} {{ site.free_delivery_threshold|floatformat:0 }}. Pay by cash or card on delivery, or bank transfer.</p>
+      </form>
+    </div>
+
+    {% if product.spec_rows %}
+    <h3 style="margin-top:1.5rem">Specifications</h3>
+    <table class="specs">
+      {% for label, value in product.spec_rows %}<tr><th>{{ label }}</th><td>{{ value }}</td></tr>{% endfor %}
+    </table>
+    {% endif %}
+
+    {% if product.description %}
+    <h3>Description</h3>
+    <div class="prose">{{ product.description|linebreaks }}</div>
+    {% endif %}
+    <p class="small muted">Need a different size, logo or Arabic text? <a href="{% url 'catalog:quote_request' %}">Request a custom quote</a> or WhatsApp us on {{ site.mobile_1 }}.</p>
+  </div>
+</div>
+
+{% if related %}
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <h2>You may also like</h2>
+    <div class="grid grid-4">
+      {% for product in related %}{% include "catalog/_product_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My account{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span>My account</span></nav><h1>Hello, {{ user.first_name|default:user.email }}</h1></div></div>
+<div class="container section">
+  <div class="grid grid-2" style="align-items:start">
+    <div>
+      <div class="checkout-section">
+        <h2>Recent orders</h2>
+        {% if recent_orders %}
+          <table class="data-table">
+            <thead><tr><th>Order</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>{% for o in recent_orders %}<tr><td><a href="{% url 'shop:my_order_detail' o.number %}">{{ o.number }}</a></td><td>{{ o.created_at|date:"j M Y" }}</td><td>{{ o.currency }} {{ o.total|floatformat:2 }}</td><td><span class="order-status">{{ o.get_status_display }}</span></td></tr>{% endfor %}</tbody>
+          </table>
+          <p style="margin-top:.8rem"><a href="{% url 'shop:my_orders' %}">View all orders ›</a></p>
+        {% else %}
+          <p class="muted">You have not placed any orders yet.</p>
+        {% endif %}
+      </div>
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline btn-sm">Log out</button></form>
+    </div>
+    <div>
+      <div class="checkout-section">
+        <h2>Your details</h2>
+        <form method="post" novalidate>{% csrf_token %}{% include "_form_fields.html" with form=profile_form %}<button type="submit" name="update_profile" class="btn">Save details</button></form>
+      </div>
+      <div class="checkout-section">
+        <h2>Change password</h2>
+        <form method="post" novalidate>{% csrf_token %}{% include "_form_fields.html" with form=password_form %}<button type="submit" name="change_password" class="btn btn-outline">Change password</button></form>
+      </div>
+      <p class="small muted">To request a copy or deletion of your personal data, email <a href="mailto:{{ site.email }}">{{ site.email }}</a> (see our <a href="/pages/privacy-policy/">Privacy Policy</a>).</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

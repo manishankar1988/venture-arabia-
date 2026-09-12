@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /shop/cart/
+Disallow: /shop/checkout/
+Disallow: /shop/my-orders/
+Disallow: /accounts/
+Allow: /
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml

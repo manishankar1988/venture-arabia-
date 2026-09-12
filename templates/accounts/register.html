@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="narrow auth-card">
+    <h1>Create an account</h1>
+    <p class="muted">Track orders, re-order quickly and save your delivery details.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "_form_fields.html" with form=form %}
+      <button type="submit" class="btn btn-block">Create account</button>
+    </form>
+    <p class="small" style="margin-top:1rem;text-align:center">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

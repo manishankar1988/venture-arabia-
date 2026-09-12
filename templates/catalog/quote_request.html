@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Request a quote{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'catalog:service_list' %}">Services</a></span><span>Request a quote</span></nav><h1>Request a quote</h1><p class="muted" style="margin:0">For custom stamps, bulk printing, photocopying, laminating, binding and toner supply.</p></div></div>
+<div class="container section">
+  <div class="narrow auth-card">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {{ form.website }}
+      {% include "_form_fields.html" with form=form %}
+      <p class="small muted">By submitting this form you agree to our <a href="/pages/privacy-policy/">Privacy Policy</a>. We only use your details to respond to this request.</p>
+      <button type="submit" class="btn btn-block">Send quote request</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

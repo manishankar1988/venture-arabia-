@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Services - printing, photocopying, laminating, binding & stamp making{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span>Services</span></nav><h1>Our services</h1><p class="muted" style="margin:0">Special rates for schools, colleges and corporate offices. Free collection and delivery within Doha.</p></div></div>
+<div class="container section">
+  {% if services %}
+  <div class="grid grid-3">
+    {% for service in services %}{% include "catalog/_service_card.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="empty"><p>Our service list is being updated. Please <a href="{% url 'cms:contact' %}">contact us</a> for a quote.</p></div>
+  {% endif %}
+  <div class="cta-band" style="border-radius:var(--radius);padding:2rem;margin-top:2.5rem">
+    <h2>Have a bulk job or a special requirement?</h2>
+    <p>Tell us what you need and we will send a written quotation, usually within one working day.</p>
+    <a href="{% url 'catalog:quote_request' %}" class="btn btn-light">Request a quote</a>
+  </div>
+</div>
+{% endblock %}

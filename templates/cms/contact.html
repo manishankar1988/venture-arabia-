@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Contact us{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span>Contact</span></nav><h1>Contact us</h1></div></div>
+<div class="container contact-grid">
+  <div class="contact-card">
+    <h2>Send us a message</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.website }}
+      {% include "_form_fields.html" with form=form %}
+      <button type="submit" class="btn">Send message</button>
+    </form>
+  </div>
+  <div>
+    <div class="contact-card" style="margin-bottom:1.2rem">
+      <h2>Visit or call us</h2>
+      <address style="font-style:normal;line-height:1.7">
+        <strong>{{ site.company_name }}</strong><br>
+        P.O. Box {{ site.po_box }}<br>{{ site.building }}<br>{{ site.zone }}, {{ site.street }}<br>{{ site.landmark }}<br>{{ site.area }}, {{ site.city }}, {{ site.country }}
+      </address>
+      <ul class="plain" style="margin-top:1rem">
+        <li><strong>Tel:</strong> <a href="tel:{{ site.phone|cut:' ' }}">{{ site.phone }}</a></li>
+        <li><strong>Mobile:</strong> <a href="tel:{{ site.mobile_1|cut:' ' }}">{{ site.mobile_1 }}</a>{% if site.mobile_2 %} / <a href="tel:{{ site.mobile_2|cut:' ' }}">{{ site.mobile_2 }}</a>{% endif %}</li>
+        <li><strong>Email:</strong> <a href="mailto:{{ site.email }}">{{ site.email }}</a>{% if site.email_secondary %} / <a href="mailto:{{ site.email_secondary }}">{{ site.email_secondary }}</a>{% endif %}</li>
+        {% if site.whatsapp_link %}<li><strong>WhatsApp:</strong> <a href="{{ site.whatsapp_link }}" target="_blank" rel="noopener">Chat with us</a></li>{% endif %}
+      </ul>
+      <h3>Opening hours</h3>
+      <ul class="plain">{% for line in site.opening_hours_lines %}<li>{{ line }}</li>{% endfor %}</ul>
+      {% if site.google_maps_link %}<a class="btn btn-outline btn-sm" href="{{ site.google_maps_link }}" target="_blank" rel="noopener">Open in Google Maps</a>{% endif %}
+    </div>
+    {% if site.google_maps_embed_url %}<iframe class="map" src="{{ site.google_maps_embed_url }}" loading="lazy" title="Map to {{ site.company_name }}" referrerpolicy="no-referrer-when-downgrade"></iframe>{% endif %}
+  </div>
+</div>
+{% endblock %}

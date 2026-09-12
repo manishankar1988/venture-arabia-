@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ service.name }}{% endblock %}
+{% block meta_description %}{{ service.short_description|truncatechars:160 }}{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><span><a href="{% url 'cms:home' %}">Home</a></span><span><a href="{% url 'catalog:service_list' %}">Services</a></span><span>{{ service.name }}</span></nav><h1>{{ service.name }}</h1><p class="muted" style="margin:0">{{ service.short_description }}</p></div></div>
+<div class="container listing" style="grid-template-columns:1fr 320px">
+  <div>
+    {% if service.image %}<img src="{{ service.image.url }}" alt="{{ service.name }}" style="border-radius:var(--radius);margin-bottom:1.2rem">{% endif %}
+    <div class="prose" style="background:#fff;padding:1.6rem;border-radius:var(--radius);border:1px solid var(--border)">{{ service.description|linebreaks }}</div>
+  </div>
+  <aside>
+    <div class="summary">
+      <div class="service-icon">{% include "catalog/_service_icon.html" with icon=service.icon %}</div>
+      {% if service.starting_price %}<p>From <strong class="price">{{ CURRENCY }} {{ service.starting_price|floatformat:2 }}</strong> {{ service.price_unit }}</p>{% endif %}
+      {% if service.turnaround %}<p class="small muted">Turnaround: {{ service.turnaround }}</p>{% endif %}
+      <a href="{% url 'catalog:quote_request' %}?service={{ service.slug }}" class="btn btn-block">Request a quote</a>
+      {% if site.whatsapp_link %}<a href="{{ site.whatsapp_link }}" class="btn btn-outline btn-block" style="margin-top:.5rem" target="_blank" rel="noopener">WhatsApp us</a>{% endif %}
+      <p class="small muted" style="margin-top:1rem">Free collection &amp; delivery within Doha. Call {{ site.phone }}.</p>
+    </div>
+    {% if others %}
+    <div style="margin-top:1.2rem">
+      <h3>Other services</h3>
+      <ul class="plain">{% for o in others %}<li><a href="{{ o.get_absolute_url }}">{{ o.name }}</a></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
