@@ -15,6 +15,7 @@
 databases:
   - name: venture-arabia-db
     plan: free
+    region: frankfurt   # must match the web service region for the internal connection string
     databaseName: venture
     user: venture
 
@@ -25,8 +26,9 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
-    startCommand: gunicorn venture.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    # migrations run at start (the database is only reachable from the running service, not the build)
+    startCommand: python manage.py migrate --noinput && gunicorn venture.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
