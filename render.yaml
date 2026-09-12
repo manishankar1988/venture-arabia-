@@ -1,0 +1,59 @@
+# Render.com blueprint: gives the site a public URL (https://venture-arabia.onrender.com)
+# straight from the GitHub repository.
+#
+#   1. Push this repo to GitHub.
+#   2. On https://dashboard.render.com  ->  New  ->  Blueprint  ->  select the repo  ->  Apply.
+#   3. When the first deploy finishes, open the service Shell and run:
+#        python manage.py seed_demo && python manage.py attach_catalogue_images && python manage.py createsuperuser
+#   4. Admin panel:  https://<your-service>.onrender.com/manage/
+#
+# Notes: the free web service sleeps after 15 minutes idle and its disk is reset on every
+# deploy, so photos uploaded through the admin need the paid persistent disk (or keep
+# adding them to media/ in git). The free PostgreSQL instance expires after 30 days
+# unless upgraded. Set ADMIN_URL to something private in the dashboard before launch.
+
+databases:
+  - name: venture-arabia-db
+    plan: free
+    databaseName: venture
+    user: venture
+
+services:
+  - type: web
+    name: venture-arabia
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
+    startCommand: gunicorn venture.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "0"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: ADMIN_URL
+        value: "manage/"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: venture-arabia-db
+          property: connectionString
+      - key: DB_SSLMODE
+        value: "require"
+      - key: BEHIND_PROXY
+        value: "1"
+      - key: FORCE_HTTPS
+        value: "0"
+      - key: SERVE_MEDIA
+        value: "1"
+      - key: DEFAULT_FROM_EMAIL
+        value: "Venture Arabia <venture@venture.com.qa>"
+      - key: ORDER_NOTIFICATION_EMAIL
+        value: "venture@venture.com.qa"

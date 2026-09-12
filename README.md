@@ -119,6 +119,14 @@ Authority (CRA).
 All of them use the same code from git and the same `.env` values (section 4.3).
 `python manage.py check --deploy` must report no warnings before you go live.
 
+**0. Quick public URL for testing (Render.com, free tier)**
+Push the repo to GitHub, then on <https://dashboard.render.com> choose *New -> Blueprint*, pick the
+repository and apply `render.yaml`. You get `https://venture-arabia.onrender.com` with PostgreSQL
+attached. Afterwards open the service *Shell* and run `python manage.py seed_demo`,
+`python manage.py attach_catalogue_images` and `python manage.py createsuperuser`.
+The free tier sleeps when idle and loses admin-uploaded photos on redeploy, so use it for
+review, not for the real shop.
+
 **A. Docker Compose (recommended – one command on any Linux server)**
 ```bash
 git clone <your-repo> venture && cd venture
